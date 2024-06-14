@@ -191,9 +191,13 @@ func (s *Server) handleConnect(ctx context.Context, conn conn, req *Request) err
 	defer target.Close()
 
 	// Send success
-	local := target.LocalAddr().(*net.TCPAddr)
-	bind := AddrSpec{IP: local.IP, Port: local.Port}
-	if err := sendReply(conn, successReply, &bind); err != nil {
+	var bind *AddrSpec
+	if local, ok := target.LocalAddr().(*net.TCPAddr); ok {
+		bind = &AddrSpec{IP: local.IP, Port: local.Port}
+	} else if local, ok := target.LocalAddr().(*net.UDPAddr); ok {
+		bind = &AddrSpec{IP: local.IP, Port: local.Port}
+	}
+	if err := sendReply(conn, successReply, bind); err != nil {
 		return fmt.Errorf("Failed to send reply: %v", err)
 	}
 
