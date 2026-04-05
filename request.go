@@ -314,7 +314,7 @@ func sendReply(w io.Writer, resp uint8, addr *AddrSpec) error {
 	var addrBody []byte
 	var addrPort uint16
 	switch {
-	case addr == nil:
+	case addr == nil || (addr.FQDN == "" && len(addr.IP) == 0):
 		addrType = ipv4Address
 		addrBody = []byte{0, 0, 0, 0}
 		addrPort = 0
